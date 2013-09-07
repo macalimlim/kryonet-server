@@ -6,12 +6,12 @@ import net.dlogic.kryonet.common.response.LoginSuccessResponse;
 
 public abstract class LoginEventHandler extends BaseEventHandler {
 	public abstract void onLogin(String username, String password);
-	public final void sendLoginSuccess(User user) {
+	public final void sendLoginSuccessResponse(User user) {
 		LoginSuccessResponse response = new LoginSuccessResponse();
 		response.myself = user;
 		connection.sendTCP(response);
 	}
-	public final void sendLoginFailure(String errorMessage) {
+	public final void sendLoginFailureResponse(String errorMessage) {
 		LoginFailureResponse response = new LoginFailureResponse();
 		response.errorMessage = errorMessage;
 		connection.sendTCP(response);
