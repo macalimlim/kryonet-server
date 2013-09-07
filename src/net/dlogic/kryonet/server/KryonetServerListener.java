@@ -1,15 +1,15 @@
 package net.dlogic.kryonet.server;
 
 import net.dlogic.kryonet.common.request.LoginRequest;
+import net.dlogic.kryonet.server.event.handler.LoginEventHandler;
 
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.reflectasm.ConstructorAccess;
-import com.esotericsoftware.reflectasm.MethodAccess;
 
 public class KryonetServerListener extends Listener {
-	private Class<ILoginEventHandler> loginEventHandler;
-	public void setLoginEventHandler(Class<ILoginEventHandler> handler) {
+	private Class<? extends LoginEventHandler> loginEventHandler;
+	public void setLoginEventHandler(Class<LoginEventHandler> handler) {
 		loginEventHandler = handler;
 	}
 	public void connected(Connection connection) {
@@ -23,9 +23,10 @@ public class KryonetServerListener extends Listener {
 	public void received(Connection connection, Object object) {
 		if (object instanceof LoginRequest) {
 			LoginRequest loginRequest = (LoginRequest)object;
-			ConstructorAccess<ILoginEventHandler> access = ConstructorAccess.get(loginEventHandler);
-			ILoginEventHandler handler = access.newInstance();
-			handler.onLogin(connection, loginRequest.username, loginRequest.password);
+			ConstructorAccess<? extends LoginEventHandler> access = ConstructorAccess.get(loginEventHandler);
+			LoginEventHandler handler = access.newInstance();
+			handler.setConnection(connection);
+			handler.onLogin(loginRequest.username, loginRequest.password);
 		}
 	}
 	public void idle(Connection connection) {
