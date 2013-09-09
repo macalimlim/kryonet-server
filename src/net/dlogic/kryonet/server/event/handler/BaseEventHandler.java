@@ -1,10 +1,10 @@
 package net.dlogic.kryonet.server.event.handler;
 
-import com.esotericsoftware.kryonet.Connection;
+import net.dlogic.kryonet.common.entity.User;
 
 public abstract class BaseEventHandler {
-	protected Connection connection;
-	public void setConnection(Connection connection) {
-		this.connection = connection;
+	protected User sender;
+	public void setSender(User sender) {
+		this.sender = sender;
 	}
 }
