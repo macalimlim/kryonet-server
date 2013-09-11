@@ -1,10 +1,14 @@
 package net.dlogic.kryonet.server;
 
+import java.util.Iterator;
+
+import net.dlogic.kryonet.common.entity.Room;
 import net.dlogic.kryonet.common.entity.User;
 import net.dlogic.kryonet.common.exception.LoginException;
 import net.dlogic.kryonet.common.manager.RoomManager;
 import net.dlogic.kryonet.common.manager.UserManager;
 import net.dlogic.kryonet.common.request.JoinRoomRequest;
+import net.dlogic.kryonet.common.request.LeaveRoomRequest;
 import net.dlogic.kryonet.common.request.LoginRequest;
 import net.dlogic.kryonet.common.request.LogoutRequest;
 import net.dlogic.kryonet.common.request.PrivateMessageRequest;
@@ -56,19 +60,21 @@ public class KryonetServerListener extends Listener {
 		super.disconnected(connection);
 	}
 	public void received(Connection connection, Object object) {
+		User sender = userManager.get(connection.getID());
 		if (object instanceof JoinRoomRequest) {
 			JoinRoomRequest request = (JoinRoomRequest)object;
 			ConstructorAccess<? extends JoinRoomEventHandler> access = ConstructorAccess.get(joinRoomEventHandler);
 			JoinRoomEventHandler handler = access.newInstance();
-			handler.setSender(userManager.get(connection.getID()));
+			handler.sender = sender;
 			handler.onJoinRoom(request.roomToJoin, request.password);
+		} else if (object instanceof LeaveRoomRequest) {
+			
 		} else if (object instanceof LoginRequest) {
 			LoginRequest request = (LoginRequest)object;
 			ConstructorAccess<? extends LoginEventHandler> access = ConstructorAccess.get(loginEventHandler);
 			LoginEventHandler handler = access.newInstance();
 			try {
-				User sender = userManager.get(connection.getID());
-				handler.setSender(sender);
+				handler.sender = sender;
 				handler.onLogin(request.username, request.password);
 				sender.setUsername(request.username);
 				handler.sendLoginSuccessResponse();
@@ -76,22 +82,29 @@ public class KryonetServerListener extends Listener {
 				handler.sendLoginFailureResponse(ex.getMessage());
 			}
 		} else if (object instanceof LogoutRequest) {
-			LogoutRequest request = (LogoutRequest)object;
+			//LogoutRequest request = (LogoutRequest)object;
 			ConstructorAccess<? extends LogoutEventHandler> access = ConstructorAccess.get(logoutEventHandler);
 			LogoutEventHandler handler = access.newInstance();
-			handler.setSender(userManager.get(connection.getID()));
-			handler.onLogout(request.userLoggingOut);
+			handler.sender = sender;
+			handler.onLogout();
+			Iterator<Room> it = roomManager.iterator();
+			while (it.hasNext()) {
+				if (it.next().containsUser(sender)) {
+					//send leave room requests to every user in the room
+				}
+			}
+			handler.sendLogoutResponse();
 		} else if (object instanceof PrivateMessageRequest) {
 			PrivateMessageRequest request = (PrivateMessageRequest)object;
 			ConstructorAccess<? extends PrivateMessageEventHandler> access = ConstructorAccess.get(privateMessageEventHandler);
 			PrivateMessageEventHandler handler = access.newInstance();
-			handler.setSender(userManager.get(connection.getID()));
+			handler.sender = sender;
 			handler.onPrivateMessage(request.message, request.targetUser);
 		} else if (object instanceof PublicMessageRequest) {
 			PublicMessageRequest request = (PublicMessageRequest)object;
 			ConstructorAccess<? extends PublicMessageEventHandler> access = ConstructorAccess.get(publicMessageEventHandler);
 			PublicMessageEventHandler handler = access.newInstance();
-			handler.setSender(userManager.get(connection.getID()));
+			handler.sender = sender;
 			handler.onPublicMessage(request.message, request.targetRoom);
 		}
 	}
