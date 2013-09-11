@@ -4,15 +4,15 @@ import java.io.IOException;
 
 public class KryonetServerInstance {
 	private static KryonetServer server;
-	public static void initialize(int writeBufferSize, int objectBufferSize, int tcpPort, int udpPort) throws IOException, KryonetServerInstanceException {
+	public static void initialize(int writeBufferSize, int objectBufferSize) throws IOException, KryonetServerException {
 		if (server != null) {
-			throw new KryonetServerInstanceException(KryonetServerInstanceException.ALREADY_INITIALIZED);
+			throw new KryonetServerException(KryonetServerException.ALREADY_INITIALIZED);
 		}
-		server = new KryonetServer(writeBufferSize, objectBufferSize, tcpPort, udpPort);
+		server = new KryonetServer(writeBufferSize, objectBufferSize);
 	}
-	public static KryonetServer getInstance() throws KryonetServerInstanceException {
+	public static KryonetServer getInstance() throws KryonetServerException {
 		if (server == null) {
-			throw new KryonetServerInstanceException(KryonetServerInstanceException.NOT_INITIALIZED);
+			throw new KryonetServerException(KryonetServerException.NOT_INITIALIZED);
 		}
 		return server;
 	}
