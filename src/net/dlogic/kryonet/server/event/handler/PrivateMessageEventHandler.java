@@ -5,10 +5,10 @@ import net.dlogic.kryonet.common.response.PrivateMessageResponse;
 
 public abstract class PrivateMessageEventHandler extends BaseEventHandler {
 	public abstract void onPrivateMessage(String message, User targetUser);
-	public void sendPrivateMessageResponse(String message, User fromUser, User targetUser) {
+	public void sendPrivateMessageResponse(String message, User sender, User target) {
 		PrivateMessageResponse response = new PrivateMessageResponse();
-		response.fromUser = fromUser;
+		response.sender = sender;
 		response.message = message;
-		targetUser.getConnection().sendTCP(response);
+		target.getConnection().sendTCP(response);
 	}
 }
