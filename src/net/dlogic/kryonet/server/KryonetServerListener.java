@@ -4,6 +4,7 @@ import java.util.Iterator;
 
 import net.dlogic.kryonet.common.entity.Room;
 import net.dlogic.kryonet.common.entity.User;
+import net.dlogic.kryonet.common.exception.JoinRoomException;
 import net.dlogic.kryonet.common.exception.LoginException;
 import net.dlogic.kryonet.common.manager.RoomManager;
 import net.dlogic.kryonet.common.manager.UserManager;
@@ -55,8 +56,14 @@ public class KryonetServerListener extends Listener {
 			JoinRoomRequest request = (JoinRoomRequest)object;
 			ConstructorAccess<? extends RoomEventHandler> access = ConstructorAccess.get(roomEventHandler);
 			RoomEventHandler handler = access.newInstance();
-			handler.sender = sender;
-			handler.onJoinRoom(request.roomToJoin, request.password);
+			try {
+				handler.sender = sender;
+				Room targetRoom = roomManager.get(request.roomToJoin.getId());
+				handler.onJoinRoom(targetRoom, request.password);
+				handler.sendJoinRoomSuccessResponse(targetRoom);
+			} catch (JoinRoomException ex) {
+				handler.sendJoinRoomFailureResponse(ex.getMessage());
+			}
 		} else if (object instanceof LeaveRoomRequest) {
 			LeaveRoomRequest request = (LeaveRoomRequest)object;
 			ConstructorAccess<? extends RoomEventHandler> access = ConstructorAccess.get(roomEventHandler);
