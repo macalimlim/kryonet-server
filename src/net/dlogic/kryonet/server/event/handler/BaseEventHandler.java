@@ -6,6 +6,7 @@ import net.dlogic.kryonet.common.entity.Room;
 import net.dlogic.kryonet.common.entity.User;
 import net.dlogic.kryonet.common.response.JoinRoomFailureResponse;
 import net.dlogic.kryonet.common.response.JoinRoomSuccessResponse;
+import net.dlogic.kryonet.common.response.LeaveRoomResponse;
 import net.dlogic.kryonet.common.response.LoginFailureResponse;
 import net.dlogic.kryonet.common.response.LoginSuccessResponse;
 import net.dlogic.kryonet.common.response.LogoutResponse;
@@ -15,10 +16,10 @@ import net.dlogic.kryonet.common.response.PublicMessageResponse;
 public abstract class BaseEventHandler {
 	public User sender;
 	public void sendJoinRoomSuccessResponse(Room joinedRoom) {
-		JoinRoomSuccessResponse response = new JoinRoomSuccessResponse();
-		response.joinedRoom = joinedRoom;
 		Iterator<User> it = joinedRoom.getUserList().iterator();
 		while (it.hasNext()) {
+			JoinRoomSuccessResponse response = new JoinRoomSuccessResponse();
+			response.joinedRoom = joinedRoom;
 			it.next().getConnection().sendTCP(response);
 		}
 	}
@@ -26,6 +27,15 @@ public abstract class BaseEventHandler {
 		JoinRoomFailureResponse response = new JoinRoomFailureResponse();
 		response.errorMessage = errorMessage;
 		sender.getConnection().sendTCP(response);
+	}
+	public void sendLeaveRoomResponse(User userToLeave, Room roomToLeave) {
+		Iterator<User> it = roomToLeave.getUserList().iterator();
+		while (it.hasNext()) {
+			LeaveRoomResponse response = new LeaveRoomResponse();
+			response.userToLeave = userToLeave;
+			response.roomToLeave = roomToLeave;
+			it.next().getConnection().sendTCP(response);
+		}
 	}
 	public final void sendLoginSuccessResponse() {
 		LoginSuccessResponse response = new LoginSuccessResponse();
@@ -48,11 +58,11 @@ public abstract class BaseEventHandler {
 		target.getConnection().sendTCP(response);
 	}
 	public void sendPublicMessageResponse(String message, User sender, Room target) {
-		PublicMessageResponse response = new PublicMessageResponse();
-		response.sender = sender;
-		response.message = message;
 		Iterator<User> it = target.getUserList().iterator();
 		while (it.hasNext()) {
+			PublicMessageResponse response = new PublicMessageResponse();
+			response.sender = sender;
+			response.message = message;
 			it.next().getConnection().sendTCP(response);
 		}
 	}
