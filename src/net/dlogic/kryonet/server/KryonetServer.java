@@ -13,7 +13,7 @@ public class KryonetServer {
 	public KryonetServer(int writeBufferSize, int objectBufferSize) {
 		server = new Server(writeBufferSize, objectBufferSize);
 		KryonetUtility.registerClasses(server);
-		server.addListener(listener = new KryonetServerListener());
+		server.addListener(listener = new KryonetServerListener(server));
 	}
 	public void start(int tcpPort, int udpPort) throws IOException {
 		server.start();
