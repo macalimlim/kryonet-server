@@ -13,57 +13,61 @@ import net.dlogic.kryonet.common.response.LogoutResponse;
 import net.dlogic.kryonet.common.response.PrivateMessageResponse;
 import net.dlogic.kryonet.common.response.PublicMessageResponse;
 
+import com.esotericsoftware.kryonet.Server;
+
 public abstract class BaseEventHandler {
+	public Server server;
 	public User sender;
-	public void sendJoinRoomSuccessResponse(Room joinedRoom) {
-		Iterator<User> it = joinedRoom.getUserList().iterator();
+	public void sendJoinRoomSuccessResponse(User joinedUser, Room joinedRoom) {
+		Iterator<User> it = joinedRoom.userList.iterator();
 		while (it.hasNext()) {
 			JoinRoomSuccessResponse response = new JoinRoomSuccessResponse();
+			response.joinedUser = joinedUser;
 			response.joinedRoom = joinedRoom;
-			it.next().getConnection().sendTCP(response);
+			server.getConnections()[it.next().id].sendTCP(response);
 		}
 	}
 	public void sendJoinRoomFailureResponse(String errorMessage) {
 		JoinRoomFailureResponse response = new JoinRoomFailureResponse();
 		response.errorMessage = errorMessage;
-		sender.getConnection().sendTCP(response);
+		server.getConnections()[sender.id].sendTCP(response);
 	}
 	public void sendLeaveRoomResponse(User userToLeave, Room roomToLeave) {
-		Iterator<User> it = roomToLeave.getUserList().iterator();
+		Iterator<User> it = roomToLeave.userList.iterator();
 		while (it.hasNext()) {
 			LeaveRoomResponse response = new LeaveRoomResponse();
 			response.userToLeave = userToLeave;
 			response.roomToLeave = roomToLeave;
-			it.next().getConnection().sendTCP(response);
+			server.getConnections()[it.next().id].sendTCP(response);
 		}
 	}
 	public final void sendLoginSuccessResponse() {
 		LoginSuccessResponse response = new LoginSuccessResponse();
 		response.myself = sender;
-		sender.getConnection().sendTCP(response);
+		server.getConnections()[sender.id].sendTCP(response);
 	}
 	public final void sendLoginFailureResponse(String errorMessage) {
 		LoginFailureResponse response = new LoginFailureResponse();
 		response.errorMessage = errorMessage;
-		sender.getConnection().sendTCP(response);
+		server.getConnections()[sender.id].sendTCP(response);
 	}
 	public void sendLogoutResponse() {
 		LogoutResponse response = new LogoutResponse();
-		sender.getConnection().sendTCP(response);
+		server.getConnections()[sender.id].sendTCP(response);
 	}
-	public void sendPrivateMessageResponse(String message, User sender, User target) {
+	public void sendPrivateMessageResponse(User targetUser, String message) {
 		PrivateMessageResponse response = new PrivateMessageResponse();
 		response.sender = sender;
 		response.message = message;
-		target.getConnection().sendTCP(response);
+		server.getConnections()[targetUser.id].sendTCP(response);
 	}
-	public void sendPublicMessageResponse(String message, User sender, Room target) {
-		Iterator<User> it = target.getUserList().iterator();
+	public void sendPublicMessageResponse(String message, User sender, Room targetRoom) {
+		Iterator<User> it = targetRoom.userList.iterator();
 		while (it.hasNext()) {
 			PublicMessageResponse response = new PublicMessageResponse();
 			response.sender = sender;
 			response.message = message;
-			it.next().getConnection().sendTCP(response);
+			server.getConnections()[it.next().id].sendTCP(response);
 		}
 	}
 }
