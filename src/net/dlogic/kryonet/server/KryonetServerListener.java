@@ -22,6 +22,7 @@ import net.dlogic.kryonet.server.event.handler.RoomEventHandler;
 
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
+import com.esotericsoftware.minlog.Log;
 import com.esotericsoftware.reflectasm.ConstructorAccess;
 
 public class KryonetServerListener extends Listener {
@@ -31,6 +32,7 @@ public class KryonetServerListener extends Listener {
 	private Class<? extends LoginOrLogoutEventHandler> loginOrLogoutEventHandler;
 	private Class<? extends PersonMessageEventHandler> personMessageEventHandler;
 	public KryonetServerListener() {
+		Log.info("KryonetServerListener()");
 		userManager = UserManagerInstance.getInstance();
 		roomManager = RoomManagerInstance.getInstance();
 	}
