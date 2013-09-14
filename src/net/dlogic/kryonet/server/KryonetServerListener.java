@@ -59,7 +59,7 @@ public class KryonetServerListener extends Listener {
 		ConnectionEventHandler handler = access.newInstance();
 		User sender = userManager.get(connection.getID());
 		handler.sender = sender;
-		handler.onDisconnect();
+		handler.onDisconnected();
 		handler.sendLeaveRoomResponse();
 		userManager.remove(sender.id);
 	}
@@ -102,7 +102,6 @@ public class KryonetServerListener extends Listener {
 				handler.sendLoginFailureResponse(e.getMessage());
 			}
 		} else if (object instanceof LogoutRequest) {
-			//LogoutRequest request = (LogoutRequest)object;
 			ConstructorAccess<? extends LoginOrLogoutEventHandler> access = ConstructorAccess.get(loginOrLogoutEventHandler);
 			LoginOrLogoutEventHandler handler = access.newInstance();
 			handler.sender = sender;
