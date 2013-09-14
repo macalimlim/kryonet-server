@@ -4,6 +4,7 @@ import java.util.Iterator;
 
 import net.dlogic.kryonet.common.entity.Room;
 import net.dlogic.kryonet.common.entity.User;
+import net.dlogic.kryonet.common.manager.RoomManagerInstance;
 import net.dlogic.kryonet.common.response.JoinRoomFailureResponse;
 import net.dlogic.kryonet.common.response.JoinRoomSuccessResponse;
 import net.dlogic.kryonet.common.response.LeaveRoomResponse;
@@ -42,6 +43,16 @@ public abstract class BaseEventHandler {
 		JoinRoomFailureResponse response = new JoinRoomFailureResponse();
 		response.errorMessage = errorMessage;
 		server.sendToTCP(sender.id, response);
+	}
+	public void sendLeaveRoomResponse() {
+		Iterator<Room> it = RoomManagerInstance.getInstance().iterator();
+		while (it.hasNext()) {
+			Room room = it.next();
+			if (room.userList.contains(sender)) {
+				sendLeaveRoomResponse(room);
+				room.userList.remove(sender);
+			}
+		}
 	}
 	public void sendLeaveRoomResponse(Room roomToLeave) {
 		Iterator<User> it = roomToLeave.userList.iterator();

@@ -1,7 +1,5 @@
 package net.dlogic.kryonet.server;
 
-import java.util.Iterator;
-
 import net.dlogic.kryonet.common.entity.Room;
 import net.dlogic.kryonet.common.entity.User;
 import net.dlogic.kryonet.common.exception.JoinRoomException;
@@ -62,7 +60,7 @@ public class KryonetServerListener extends Listener {
 			RoomEventHandler handler = access.newInstance();
 			try {
 				handler.sender = sender;
-				Room targetRoom = roomManager.get(request.roomToJoin.id);
+				Room targetRoom = roomManager.get(request.targetRoomId);
 				handler.onJoinRoom(targetRoom, request.password);
 				targetRoom.userList.add(sender);
 				handler.sendJoinRoomSuccessResponse(sender, targetRoom);
@@ -74,7 +72,7 @@ public class KryonetServerListener extends Listener {
 			ConstructorAccess<? extends RoomEventHandler> access = ConstructorAccess.get(roomEventHandler);
 			RoomEventHandler handler = access.newInstance();
 			handler.sender = sender;
-			Room targetRoom = roomManager.get(request.roomToLeave.id); 
+			Room targetRoom = roomManager.get(request.targetRoomId); 
 			handler.onLeaveRoom(targetRoom);
 			handler.sendLeaveRoomResponse(targetRoom);
 			targetRoom.userList.remove(sender);
@@ -96,14 +94,7 @@ public class KryonetServerListener extends Listener {
 			LoginOrLogoutEventHandler handler = access.newInstance();
 			handler.sender = sender;
 			handler.onLogout();
-			Iterator<Room> it = roomManager.iterator();
-			while (it.hasNext()) {
-				Room room = it.next();
-				if (room.userList.contains(sender)) {
-					handler.sendLeaveRoomResponse(room);
-					room.userList.remove(sender);
-				}
-			}
+			handler.sendLeaveRoomResponse();
 			handler.sendLogoutResponse();
 			userManager.remove(sender.id);
 		} else if (object instanceof PrivateMessageRequest) {
