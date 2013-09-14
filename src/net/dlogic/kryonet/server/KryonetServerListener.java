@@ -34,8 +34,8 @@ public class KryonetServerListener extends Listener {
 	private Class<? extends PersonMessageEventHandler> personMessageEventHandler;
 	public KryonetServerListener() {
 		Log.info("KryonetServerListener()");
-		userManager = UserManagerInstance.getInstance();
-		roomManager = RoomManagerInstance.getInstance();
+		userManager = UserManagerInstance.userManager;
+		roomManager = RoomManagerInstance.roomManager;
 	}
 	public void setConnectionEventHandler(Class<? extends ConnectionEventHandler> handler) {
 		connectionEventHandler = handler;
@@ -128,7 +128,6 @@ public class KryonetServerListener extends Listener {
 		}
 	}
 	public void idle(Connection connection) {
-		// TODO Auto-generated method stub
 		super.idle(connection);
 	}
 }
