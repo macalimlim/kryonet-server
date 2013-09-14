@@ -16,8 +16,8 @@ public class KryonetServerApplication {
 			KryonetServerInstance.initialize(writeBufferSize, objectBufferSize);
 			KryonetServer server = KryonetServerInstance.getInstance();
 			KryonetServerListener listener = server.getKryonetServerListener();
+			listener.setConnectionEventHandler(MyConnectionEventHandler.class);
 			listener.setLoginOrLogoutEventHandler(MyLoginOrLogoutEventHandler.class);
-			
 			server.start(tcpPort, udpPort);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
