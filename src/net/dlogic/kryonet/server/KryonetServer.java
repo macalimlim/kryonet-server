@@ -15,7 +15,7 @@ public class KryonetServer {
 		Log.info("KryonetServer(" + writeBufferSize +  ", " + objectBufferSize + ")");
 		server = new Server(writeBufferSize, objectBufferSize);
 		KryonetUtility.registerClasses(server);
-		server.addListener(listener = new KryonetServerListener(server));
+		server.addListener(listener = new KryonetServerListener());
 	}
 	public void start(int tcpPort, int udpPort) throws IOException {
 		Log.info("KryonetServer.start(" + tcpPort +  ", " + udpPort + ")");
@@ -30,5 +30,8 @@ public class KryonetServer {
 	}
 	public void registerClass(Class type) {
 		server.getKryo().register(type);
+	}
+	public Server getServer() {
+		return server;
 	}
 }

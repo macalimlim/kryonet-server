@@ -26,14 +26,12 @@ import com.esotericsoftware.kryonet.Server;
 import com.esotericsoftware.reflectasm.ConstructorAccess;
 
 public class KryonetServerListener extends Listener {
-	private Server server;
 	private UserManager userManager;
 	private RoomManager roomManager;
 	private Class<? extends RoomEventHandler> roomEventHandler;
 	private Class<? extends LoginOrLogoutEventHandler> loginOrLogoutEventHandler;
 	private Class<? extends PersonMessageEventHandler> personMessageEventHandler;
-	public KryonetServerListener(Server server) {
-		this.server = server;
+	public KryonetServerListener() {
 		userManager = UserManagerInstance.getInstance();
 		roomManager = RoomManagerInstance.getInstance();
 	}
@@ -62,7 +60,6 @@ public class KryonetServerListener extends Listener {
 			ConstructorAccess<? extends RoomEventHandler> access = ConstructorAccess.get(roomEventHandler);
 			RoomEventHandler handler = access.newInstance();
 			try {
-				handler.server = server;
 				handler.sender = sender;
 				Room targetRoom = roomManager.get(request.roomToJoin.id);
 				handler.onJoinRoom(targetRoom, request.password);
@@ -75,7 +72,6 @@ public class KryonetServerListener extends Listener {
 			LeaveRoomRequest request = (LeaveRoomRequest)object;
 			ConstructorAccess<? extends RoomEventHandler> access = ConstructorAccess.get(roomEventHandler);
 			RoomEventHandler handler = access.newInstance();
-			handler.server = server;
 			handler.sender = sender;
 			Room targetRoom = roomManager.get(request.roomToLeave.id); 
 			handler.onLeaveRoom(targetRoom);
@@ -86,7 +82,6 @@ public class KryonetServerListener extends Listener {
 			ConstructorAccess<? extends LoginOrLogoutEventHandler> access = ConstructorAccess.get(loginOrLogoutEventHandler);
 			LoginOrLogoutEventHandler handler = access.newInstance();
 			try {
-				handler.server = server;
 				handler.sender = sender;
 				handler.onLogin(request.username, request.password);
 				sender.username = request.username;
@@ -98,7 +93,6 @@ public class KryonetServerListener extends Listener {
 			//LogoutRequest request = (LogoutRequest)object;
 			ConstructorAccess<? extends LoginOrLogoutEventHandler> access = ConstructorAccess.get(loginOrLogoutEventHandler);
 			LoginOrLogoutEventHandler handler = access.newInstance();
-			handler.server = server;
 			handler.sender = sender;
 			handler.onLogout();
 			Iterator<Room> it = roomManager.iterator();
@@ -114,7 +108,6 @@ public class KryonetServerListener extends Listener {
 			PrivateMessageRequest request = (PrivateMessageRequest)object;
 			ConstructorAccess<? extends PersonMessageEventHandler> access = ConstructorAccess.get(personMessageEventHandler);
 			PersonMessageEventHandler handler = access.newInstance();
-			handler.server = server;
 			handler.sender = sender;
 			User targetUser = userManager.get(request.targetUserId);
 			handler.onPrivateMessage(targetUser, request.message);
@@ -123,7 +116,6 @@ public class KryonetServerListener extends Listener {
 			PublicMessageRequest request = (PublicMessageRequest)object;
 			ConstructorAccess<? extends PersonMessageEventHandler> access = ConstructorAccess.get(personMessageEventHandler);
 			PersonMessageEventHandler handler = access.newInstance();
-			handler.server = server;
 			handler.sender = sender;
 			Room targetRoom = roomManager.get(request.targetRoomId);
 			handler.onPublicMessage(targetRoom, request.message);

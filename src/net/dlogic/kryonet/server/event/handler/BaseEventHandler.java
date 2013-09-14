@@ -12,6 +12,8 @@ import net.dlogic.kryonet.common.response.LoginSuccessResponse;
 import net.dlogic.kryonet.common.response.LogoutResponse;
 import net.dlogic.kryonet.common.response.PrivateMessageResponse;
 import net.dlogic.kryonet.common.response.PublicMessageResponse;
+import net.dlogic.kryonet.server.KryonetServerException;
+import net.dlogic.kryonet.server.KryonetServerInstance;
 
 import com.esotericsoftware.kryonet.Server;
 import com.esotericsoftware.minlog.Log;
@@ -19,6 +21,14 @@ import com.esotericsoftware.minlog.Log;
 public abstract class BaseEventHandler {
 	public Server server;
 	public User sender;
+	public BaseEventHandler() {
+		try {
+			server = KryonetServerInstance.getInstance().getServer();
+		} catch (KryonetServerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	public void sendJoinRoomSuccessResponse(User joinedUser, Room joinedRoom) {
 		Iterator<User> it = joinedRoom.userList.iterator();
 		while (it.hasNext()) {
