@@ -5,6 +5,7 @@ import net.dlogic.kryonet.common.entity.User;
 import net.dlogic.kryonet.common.exception.JoinRoomException;
 import net.dlogic.kryonet.common.exception.LoginException;
 import net.dlogic.kryonet.common.manager.RoomManager;
+import net.dlogic.kryonet.common.manager.RoomManagerException;
 import net.dlogic.kryonet.common.manager.RoomManagerInstance;
 import net.dlogic.kryonet.common.manager.UserManager;
 import net.dlogic.kryonet.common.manager.UserManagerInstance;
@@ -72,10 +73,12 @@ public class KryonetServerListener extends Listener {
 				handler.sender = sender;
 				Room targetRoom = roomManager.get(request.targetRoomId);
 				handler.onJoinRoom(targetRoom, request.password);
-				targetRoom.userList.add(sender);
+				roomManager.addUserToRoom(sender, targetRoom.id);
 				handler.sendJoinRoomSuccessResponse(sender, targetRoom);
-			} catch (JoinRoomException ex) {
-				handler.sendJoinRoomFailureResponse(ex.getMessage());
+			} catch (JoinRoomException e) {
+				handler.sendJoinRoomFailureResponse(e.getMessage());
+			} catch (RoomManagerException e) {
+				handler.sendJoinRoomFailureResponse(e.getMessage());
 			}
 		} else if (object instanceof LeaveRoomRequest) {
 			LeaveRoomRequest request = (LeaveRoomRequest)object;
@@ -85,7 +88,7 @@ public class KryonetServerListener extends Listener {
 			Room targetRoom = roomManager.get(request.targetRoomId); 
 			handler.onLeaveRoom(targetRoom);
 			handler.sendLeaveRoomResponse(targetRoom);
-			targetRoom.userList.remove(sender);
+			roomManager.removeUserToRoom(sender, targetRoom.id);
 		} else if (object instanceof LoginRequest) {
 			LoginRequest request = (LoginRequest)object;
 			ConstructorAccess<? extends LoginOrLogoutEventHandler> access = ConstructorAccess.get(loginOrLogoutEventHandler);
@@ -95,8 +98,8 @@ public class KryonetServerListener extends Listener {
 				handler.onLogin(request.username, request.password);
 				sender.username = request.username;
 				handler.sendLoginSuccessResponse();
-			} catch (LoginException ex) {
-				handler.sendLoginFailureResponse(ex.getMessage());
+			} catch (LoginException e) {
+				handler.sendLoginFailureResponse(e.getMessage());
 			}
 		} else if (object instanceof LogoutRequest) {
 			//LogoutRequest request = (LogoutRequest)object;
