@@ -22,7 +22,6 @@ import net.dlogic.kryonet.server.event.handler.RoomEventHandler;
 
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
-import com.esotericsoftware.kryonet.Server;
 import com.esotericsoftware.reflectasm.ConstructorAccess;
 
 public class KryonetServerListener extends Listener {
@@ -75,7 +74,7 @@ public class KryonetServerListener extends Listener {
 			handler.sender = sender;
 			Room targetRoom = roomManager.get(request.roomToLeave.id); 
 			handler.onLeaveRoom(targetRoom);
-			handler.sendLeaveRoomResponse(sender, targetRoom);
+			handler.sendLeaveRoomResponse(targetRoom);
 			targetRoom.userList.remove(sender);
 		} else if (object instanceof LoginRequest) {
 			LoginRequest request = (LoginRequest)object;
@@ -99,11 +98,12 @@ public class KryonetServerListener extends Listener {
 			while (it.hasNext()) {
 				Room room = it.next();
 				if (room.userList.contains(sender)) {
-					handler.sendLeaveRoomResponse(sender, room);
+					handler.sendLeaveRoomResponse(room);
 					room.userList.remove(sender);
 				}
 			}
 			handler.sendLogoutResponse();
+			userManager.remove(sender.id);
 		} else if (object instanceof PrivateMessageRequest) {
 			PrivateMessageRequest request = (PrivateMessageRequest)object;
 			ConstructorAccess<? extends PersonMessageEventHandler> access = ConstructorAccess.get(personMessageEventHandler);

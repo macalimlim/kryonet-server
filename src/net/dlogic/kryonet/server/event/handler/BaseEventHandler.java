@@ -43,11 +43,11 @@ public abstract class BaseEventHandler {
 		response.errorMessage = errorMessage;
 		server.sendToTCP(sender.id, response);
 	}
-	public void sendLeaveRoomResponse(User userToLeave, Room roomToLeave) {
+	public void sendLeaveRoomResponse(Room roomToLeave) {
 		Iterator<User> it = roomToLeave.userList.iterator();
 		while (it.hasNext()) {
 			LeaveRoomResponse response = new LeaveRoomResponse();
-			response.userToLeave = userToLeave;
+			response.userToLeave = sender;
 			response.roomToLeave = roomToLeave;
 			server.sendToTCP(it.next().id, response);
 		}
