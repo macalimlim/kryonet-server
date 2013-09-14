@@ -14,6 +14,7 @@ import net.dlogic.kryonet.common.request.LoginRequest;
 import net.dlogic.kryonet.common.request.LogoutRequest;
 import net.dlogic.kryonet.common.request.PrivateMessageRequest;
 import net.dlogic.kryonet.common.request.PublicMessageRequest;
+import net.dlogic.kryonet.server.event.handler.ConnectionEventHandler;
 import net.dlogic.kryonet.server.event.handler.LoginOrLogoutEventHandler;
 import net.dlogic.kryonet.server.event.handler.PersonMessageEventHandler;
 import net.dlogic.kryonet.server.event.handler.RoomEventHandler;
@@ -26,6 +27,7 @@ import com.esotericsoftware.reflectasm.ConstructorAccess;
 public class KryonetServerListener extends Listener {
 	private UserManager userManager;
 	private RoomManager roomManager;
+	private Class<? extends ConnectionEventHandler> connectionEventHandler;
 	private Class<? extends RoomEventHandler> roomEventHandler;
 	private Class<? extends LoginOrLogoutEventHandler> loginOrLogoutEventHandler;
 	private Class<? extends PersonMessageEventHandler> personMessageEventHandler;
@@ -33,6 +35,9 @@ public class KryonetServerListener extends Listener {
 		Log.info("KryonetServerListener()");
 		userManager = UserManagerInstance.getInstance();
 		roomManager = RoomManagerInstance.getInstance();
+	}
+	public void setConnectionEventHandler(Class<? extends ConnectionEventHandler> handler) {
+		connectionEventHandler = handler;
 	}
 	public void setRoomEventHandler(Class<? extends RoomEventHandler> handler) {
 		roomEventHandler = handler;
@@ -49,8 +54,13 @@ public class KryonetServerListener extends Listener {
 		userManager.put(user.id, user);
 	}
 	public void disconnected(Connection connection) {
-		// TODO Auto-generated method stub
-		super.disconnected(connection);
+		ConstructorAccess<? extends ConnectionEventHandler> access = ConstructorAccess.get(connectionEventHandler);
+		ConnectionEventHandler handler = access.newInstance();
+		User sender = userManager.get(connection.getID());
+		handler.sender = sender;
+		handler.onDisconnect();
+		handler.sendLeaveRoomResponse();
+		userManager.remove(sender.id);
 	}
 	public void received(Connection connection, Object object) {
 		User sender = userManager.get(connection.getID());
@@ -112,6 +122,7 @@ public class KryonetServerListener extends Listener {
 			handler.sender = sender;
 			Room targetRoom = roomManager.get(request.targetRoomId);
 			handler.onPublicMessage(targetRoom, request.message);
+			handler.sendPublicMessageResponse(targetRoom, request.message);
 		}
 	}
 	public void idle(Connection connection) {
