@@ -50,7 +50,6 @@ public abstract class BaseEventHandler {
 			Room room = it.next();
 			if (room.userList.contains(sender)) {
 				sendLeaveRoomResponse(room);
-				room.userList.remove(sender);
 			}
 		}
 	}
@@ -84,13 +83,16 @@ public abstract class BaseEventHandler {
 		response.message = message;
 		server.sendToTCP(targetUser.id, response);
 	}
-	public void sendPublicMessageResponse(String message, User sender, Room targetRoom) {
+	public void sendPublicMessageResponse(Room targetRoom, String message) {
 		Iterator<User> it = targetRoom.userList.iterator();
 		while (it.hasNext()) {
 			PublicMessageResponse response = new PublicMessageResponse();
 			response.sender = sender;
 			response.message = message;
-			server.sendToTCP(it.next().id, response);
+			User user = it.next();
+			if (sender.id != user.id) {
+				server.sendToTCP(user.id, response);
+			}
 		}
 	}
 }
