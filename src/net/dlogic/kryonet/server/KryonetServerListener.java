@@ -1,5 +1,9 @@
 package net.dlogic.kryonet.server;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import net.dlogic.kryonet.common.entity.Room;
 import net.dlogic.kryonet.common.entity.User;
 import net.dlogic.kryonet.common.exception.JoinRoomException;
@@ -9,6 +13,7 @@ import net.dlogic.kryonet.common.manager.RoomManagerException;
 import net.dlogic.kryonet.common.manager.RoomManagerInstance;
 import net.dlogic.kryonet.common.manager.UserManager;
 import net.dlogic.kryonet.common.manager.UserManagerInstance;
+import net.dlogic.kryonet.common.request.GetRoomsRequest;
 import net.dlogic.kryonet.common.request.JoinRoomRequest;
 import net.dlogic.kryonet.common.request.LeaveRoomRequest;
 import net.dlogic.kryonet.common.request.LoginRequest;
@@ -16,6 +21,7 @@ import net.dlogic.kryonet.common.request.LogoutRequest;
 import net.dlogic.kryonet.common.request.PrivateMessageRequest;
 import net.dlogic.kryonet.common.request.PublicMessageRequest;
 import net.dlogic.kryonet.server.event.handler.ConnectionEventHandler;
+import net.dlogic.kryonet.server.event.handler.GenericEventHandler;
 import net.dlogic.kryonet.server.event.handler.LoginOrLogoutEventHandler;
 import net.dlogic.kryonet.server.event.handler.PersonMessageEventHandler;
 import net.dlogic.kryonet.server.event.handler.RoomEventHandler;
@@ -28,6 +34,7 @@ import com.esotericsoftware.reflectasm.ConstructorAccess;
 public class KryonetServerListener extends Listener {
 	private UserManager userManager;
 	private RoomManager roomManager;
+	private Class<GenericEventHandler> genereicEventHandler;
 	private Class<? extends ConnectionEventHandler> connectionEventHandler;
 	private Class<? extends RoomEventHandler> roomEventHandler;
 	private Class<? extends LoginOrLogoutEventHandler> loginOrLogoutEventHandler;
@@ -65,7 +72,20 @@ public class KryonetServerListener extends Listener {
 	}
 	public void received(Connection connection, Object object) {
 		User sender = userManager.get(connection.getID());
-		if (object instanceof JoinRoomRequest) {
+		if (object instanceof GetRoomsRequest) {
+			GetRoomsRequest request = (GetRoomsRequest)object;
+			ConstructorAccess<GenericEventHandler> access = ConstructorAccess.get(genereicEventHandler);
+			GenericEventHandler handler = access.newInstance();
+			Iterator<Room> it = RoomManagerInstance.roomManager.iterator();
+			List<Room> roomList = new ArrayList<Room>();
+			while (it.hasNext()) {
+				Room room = it.next();
+				if (room.name.equalsIgnoreCase(request.search)) {
+					roomList.add(room);
+				}
+			}
+			handler.sendGetRoomsResponse(roomList);
+		} else if (object instanceof JoinRoomRequest) {
 			JoinRoomRequest request = (JoinRoomRequest)object;
 			ConstructorAccess<? extends RoomEventHandler> access = ConstructorAccess.get(roomEventHandler);
 			RoomEventHandler handler = access.newInstance();
