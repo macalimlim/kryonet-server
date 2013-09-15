@@ -108,7 +108,7 @@ public class KryonetServerListener extends Listener {
 				handler.sendLeaveRoomResponse(targetRoom);
 				roomManager.removeUserToRoom(sender, targetRoom.id);
 			} catch (RoomManagerException e) {
-				//
+				handler.sendErrorResponse(e.getMessage());
 			}
 		} else if (object instanceof LoginRequest) {
 			LoginRequest request = (LoginRequest)object;
