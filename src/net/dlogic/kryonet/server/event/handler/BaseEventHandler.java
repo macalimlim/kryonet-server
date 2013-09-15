@@ -1,10 +1,12 @@
 package net.dlogic.kryonet.server.event.handler;
 
 import java.util.Iterator;
+import java.util.List;
 
 import net.dlogic.kryonet.common.entity.Room;
 import net.dlogic.kryonet.common.entity.User;
 import net.dlogic.kryonet.common.manager.RoomManagerInstance;
+import net.dlogic.kryonet.common.response.GetRoomsResponse;
 import net.dlogic.kryonet.common.response.JoinRoomFailureResponse;
 import net.dlogic.kryonet.common.response.JoinRoomSuccessResponse;
 import net.dlogic.kryonet.common.response.LeaveRoomResponse;
@@ -28,6 +30,11 @@ public abstract class BaseEventHandler {
 		} catch (KryonetServerException e) {
 			e.printStackTrace();
 		}
+	}
+	public void sendGetRoomsResponse(List<Room> roomList) {
+		GetRoomsResponse response = new GetRoomsResponse();
+		response.roomList = roomList;
+		endpoint.sendToTCP(sender.id, response);
 	}
 	public void sendJoinRoomSuccessResponse(User joinedUser, Room joinedRoom) {
 		Iterator<User> it = joinedRoom.userList.iterator();
