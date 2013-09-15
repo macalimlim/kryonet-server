@@ -1,6 +1,8 @@
 import java.io.IOException;
 
+import net.dlogic.kryonet.common.entity.Room;
 import net.dlogic.kryonet.common.manager.RoomManagerInstance;
+import net.dlogic.kryonet.common.utility.KryonetUtility;
 import net.dlogic.kryonet.server.KryonetServer;
 import net.dlogic.kryonet.server.KryonetServerException;
 import net.dlogic.kryonet.server.KryonetServerInstance;
@@ -16,9 +18,28 @@ public class KryonetServerApplication {
 			KryonetServerInstance.initialize(writeBufferSize, objectBufferSize);
 			KryonetServer server = KryonetServerInstance.getInstance();
 			server.listener.setConnectionEventHandler(MyConnectionEventHandler.class);
-			server.listener.setLoginOrLogoutEventHandler(MyUserEventHandler.class);
+			server.listener.setUserEventHandler(MyUserEventHandler.class);
+			server.listener.setRoomEventHandler(MyRoomEventHandler.class);
+			server.listener.setPersonMessageEventHandler(MyPersonMessageEventHandler.class);
+			KryonetUtility.registerClass(server.endpoint, CustomRequest.class);
+			KryonetUtility.registerClass(server.endpoint, CustomResponse.class);
+			server.endpoint.addListener(new CustomServerListener());
 			server.start(tcpPort, udpPort);
-			//RoomManagerInstance.roomManager.put(1, value);
+			Room room1 = new Room();
+			room1.id = 1;
+			room1.name = "Lobby";
+			room1.maxUsers = 16;
+			RoomManagerInstance.manager.map.put(room1.id, room1);
+			Room room2 = new Room();
+			room2.id = 2;
+			room2.name = "Chat";
+			room2.maxUsers = 16;
+			RoomManagerInstance.manager.map.put(room2.id, room2);
+			Room room3 = new Room();
+			room3.id = 3;
+			room3.name = "Game";
+			room3.maxUsers = 16;
+			RoomManagerInstance.manager.map.put(room3.id, room3);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

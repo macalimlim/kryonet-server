@@ -1,5 +1,6 @@
 import com.esotericsoftware.minlog.Log;
 
+import net.dlogic.kryonet.common.constant.ErrorMessage;
 import net.dlogic.kryonet.common.exception.LoginException;
 import net.dlogic.kryonet.server.event.handler.UserEventHandler;
 
@@ -7,7 +8,12 @@ public class MyUserEventHandler extends UserEventHandler {
 
 	@Override
 	public void onLogin(String username, String password) throws LoginException {
-		Log.info("MyLoginOrLogoutEventHandler.onLogin(" + username + ", " + password + ")");
+		Log.info("MyUserEventHandler.onLogin(" + username + ", " + password + ")");
+		if (username.equalsIgnoreCase("mike") && password.equalsIgnoreCase("mike")) {
+			Log.info("Yaaay!");
+		} else {
+			throw new LoginException(ErrorMessage.INVALID_USERNAME_ANDOR_PASSWORD);
+		}
 	}
 
 	@Override
