@@ -41,8 +41,8 @@ public class KryonetServerListener extends Listener {
 	private Class<? extends PersonMessageEventHandler> personMessageEventHandler;
 	public KryonetServerListener() {
 		Log.info("KryonetServerListener()");
-		userManager = UserManagerInstance.userManager;
-		roomManager = RoomManagerInstance.roomManager;
+		userManager = UserManagerInstance.manager;
+		roomManager = RoomManagerInstance.manager;
 	}
 	public void setConnectionEventHandler(Class<? extends ConnectionEventHandler> handler) {
 		connectionEventHandler = handler;
@@ -59,23 +59,23 @@ public class KryonetServerListener extends Listener {
 	public void connected(Connection connection) {
 		User user = new User();
 		user.id = connection.getID();
-		userManager.put(user.id, user);
+		userManager.map.put(user.id, user);
 	}
 	public void disconnected(Connection connection) {
 		ConnectionEventHandler handler = ConstructorAccess.get(connectionEventHandler).newInstance();
-		User sender = userManager.get(connection.getID());
+		User sender = userManager.map.get(connection.getID());
 		handler.sender = sender;
 		handler.onDisconnected();
 		handler.sendLeaveRoomResponse();
-		userManager.remove(sender.id);
+		userManager.map.remove(sender.id);
 	}
 	public void received(Connection connection, Object object) {
-		User sender = userManager.get(connection.getID());
+		User sender = userManager.map.get(connection.getID());
 		if (object instanceof GetRoomsRequest) {
 			GetRoomsRequest request = (GetRoomsRequest)object;
 			GenericEventHandler handler = ConstructorAccess.get(genereicEventHandler).newInstance();
 			handler.sender = sender;
-			Iterator<Room> it = RoomManagerInstance.roomManager.iterator();
+			Iterator<Room> it = RoomManagerInstance.manager.map.values().iterator();
 			List<Room> roomList = new ArrayList<Room>();
 			while (it.hasNext()) {
 				Room room = it.next();
@@ -89,7 +89,7 @@ public class KryonetServerListener extends Listener {
 			RoomEventHandler handler = ConstructorAccess.get(roomEventHandler).newInstance();
 			try {
 				handler.sender = sender;
-				Room targetRoom = roomManager.get(request.targetRoomId);
+				Room targetRoom = roomManager.map.get(request.targetRoomId);
 				handler.onJoinRoom(targetRoom, request.password);
 				roomManager.addUserToRoom(sender, targetRoom.id);
 				handler.sendJoinRoomSuccessResponse(sender, targetRoom);
@@ -102,7 +102,7 @@ public class KryonetServerListener extends Listener {
 			LeaveRoomRequest request = (LeaveRoomRequest)object;
 			RoomEventHandler handler = ConstructorAccess.get(roomEventHandler).newInstance();
 			handler.sender = sender;
-			Room targetRoom = roomManager.get(request.targetRoomId); 
+			Room targetRoom = roomManager.map.get(request.targetRoomId); 
 			handler.onLeaveRoom(targetRoom);
 			handler.sendLeaveRoomResponse(targetRoom);
 			roomManager.removeUserToRoom(sender, targetRoom.id);
@@ -123,19 +123,19 @@ public class KryonetServerListener extends Listener {
 			handler.onLogout();
 			handler.sendLeaveRoomResponse();
 			handler.sendLogoutResponse();
-			userManager.remove(sender.id);
+			userManager.map.remove(sender.id);
 		} else if (object instanceof PrivateMessageRequest) {
 			PrivateMessageRequest request = (PrivateMessageRequest)object;
 			PersonMessageEventHandler handler = ConstructorAccess.get(personMessageEventHandler).newInstance();
 			handler.sender = sender;
-			User targetUser = userManager.get(request.targetUserId);
+			User targetUser = userManager.map.get(request.targetUserId);
 			handler.onPrivateMessage(targetUser, request.message);
 			handler.sendPrivateMessageResponse(targetUser, request.message);
 		} else if (object instanceof PublicMessageRequest) {
 			PublicMessageRequest request = (PublicMessageRequest)object;
 			PersonMessageEventHandler handler = ConstructorAccess.get(personMessageEventHandler).newInstance();
 			handler.sender = sender;
-			Room targetRoom = roomManager.get(request.targetRoomId);
+			Room targetRoom = roomManager.map.get(request.targetRoomId);
 			handler.onPublicMessage(targetRoom, request.message);
 			handler.sendPublicMessageResponse(targetRoom, request.message);
 		}

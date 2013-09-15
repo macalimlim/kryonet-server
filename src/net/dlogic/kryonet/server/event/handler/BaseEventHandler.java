@@ -51,7 +51,7 @@ public abstract class BaseEventHandler {
 		endpoint.sendToTCP(sender.id, response);
 	}
 	public void sendLeaveRoomResponse() {
-		Iterator<Room> it = RoomManagerInstance.roomManager.iterator();
+		Iterator<Room> it = RoomManagerInstance.manager.map.values().iterator();
 		while (it.hasNext()) {
 			Room room = it.next();
 			if (room.userList.contains(sender)) {
