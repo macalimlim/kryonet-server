@@ -50,7 +50,7 @@ public class KryonetServerListener extends Listener {
 	public void setRoomEventHandler(Class<? extends RoomEventHandler> handler) {
 		roomEventHandler = handler;
 	}
-	public void setLoginOrLogoutEventHandler(Class<? extends UserEventHandler> handler) {
+	public void setUserEventHandler(Class<? extends UserEventHandler> handler) {
 		userEventHandler = handler;
 	}
 	public void setPersonMessageEventHandler(Class<? extends PersonMessageEventHandler> handler) {
@@ -77,13 +77,17 @@ public class KryonetServerListener extends Listener {
 		if (object instanceof GetRoomsRequest) {
 			GetRoomsRequest request = (GetRoomsRequest)object;
 			GenericEventHandler handler = ConstructorAccess.get(genereicEventHandler).newInstance();
-			handler.sender = sender;
+			handler.sender = sender;			
 			Iterator<Room> it = RoomManagerInstance.manager.map.values().iterator();
 			List<Room> roomList = new ArrayList<Room>();
 			while (it.hasNext()) {
 				Room room = it.next();
-				if (room.name.equalsIgnoreCase(request.search)) {
+				if (request.search == null) {
 					roomList.add(room);
+				} else {
+					if (room.name.equalsIgnoreCase(request.search)) {
+						roomList.add(room);
+					}
 				}
 			}
 			handler.sendGetRoomsResponse(roomList);
