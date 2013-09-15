@@ -34,7 +34,7 @@ import com.esotericsoftware.reflectasm.ConstructorAccess;
 public class KryonetServerListener extends Listener {
 	private UserManager userManager;
 	private RoomManager roomManager;
-	private Class<GenericEventHandler> genereicEventHandler;
+	private Class<GenericEventHandler> genereicEventHandler = GenericEventHandler.class;
 	private Class<? extends ConnectionEventHandler> connectionEventHandler;
 	private Class<? extends RoomEventHandler> roomEventHandler;
 	private Class<? extends UserEventHandler> userEventHandler;
@@ -57,9 +57,12 @@ public class KryonetServerListener extends Listener {
 		personMessageEventHandler = handler;
 	}
 	public void connected(Connection connection) {
-		User user = new User();
-		user.id = connection.getID();
-		userManager.map.put(user.id, user);
+		ConnectionEventHandler handler = ConstructorAccess.get(connectionEventHandler).newInstance();
+		User sender = new User();
+		sender.id = connection.getID();
+		handler.sender = sender;
+		handler.onConnected();
+		userManager.map.put(sender.id, sender);
 	}
 	public void disconnected(Connection connection) {
 		ConnectionEventHandler handler = ConstructorAccess.get(connectionEventHandler).newInstance();
