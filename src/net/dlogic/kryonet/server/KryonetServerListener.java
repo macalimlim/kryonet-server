@@ -22,7 +22,7 @@ import net.dlogic.kryonet.common.request.PrivateMessageRequest;
 import net.dlogic.kryonet.common.request.PublicMessageRequest;
 import net.dlogic.kryonet.server.event.handler.ConnectionEventHandler;
 import net.dlogic.kryonet.server.event.handler.GenericEventHandler;
-import net.dlogic.kryonet.server.event.handler.LoginOrLogoutEventHandler;
+import net.dlogic.kryonet.server.event.handler.UserEventHandler;
 import net.dlogic.kryonet.server.event.handler.PersonMessageEventHandler;
 import net.dlogic.kryonet.server.event.handler.RoomEventHandler;
 
@@ -37,7 +37,7 @@ public class KryonetServerListener extends Listener {
 	private Class<GenericEventHandler> genereicEventHandler;
 	private Class<? extends ConnectionEventHandler> connectionEventHandler;
 	private Class<? extends RoomEventHandler> roomEventHandler;
-	private Class<? extends LoginOrLogoutEventHandler> loginOrLogoutEventHandler;
+	private Class<? extends UserEventHandler> userEventHandler;
 	private Class<? extends PersonMessageEventHandler> personMessageEventHandler;
 	public KryonetServerListener() {
 		Log.info("KryonetServerListener()");
@@ -50,8 +50,8 @@ public class KryonetServerListener extends Listener {
 	public void setRoomEventHandler(Class<? extends RoomEventHandler> handler) {
 		roomEventHandler = handler;
 	}
-	public void setLoginOrLogoutEventHandler(Class<? extends LoginOrLogoutEventHandler> handler) {
-		loginOrLogoutEventHandler = handler;
+	public void setLoginOrLogoutEventHandler(Class<? extends UserEventHandler> handler) {
+		userEventHandler = handler;
 	}
 	public void setPersonMessageEventHandler(Class<? extends PersonMessageEventHandler> handler) {
 		personMessageEventHandler = handler;
@@ -108,7 +108,7 @@ public class KryonetServerListener extends Listener {
 			roomManager.removeUserToRoom(sender, targetRoom.id);
 		} else if (object instanceof LoginRequest) {
 			LoginRequest request = (LoginRequest)object;
-			LoginOrLogoutEventHandler handler = ConstructorAccess.get(loginOrLogoutEventHandler).newInstance();
+			UserEventHandler handler = ConstructorAccess.get(userEventHandler).newInstance();
 			try {
 				handler.sender = sender;
 				handler.onLogin(request.username, request.password);
@@ -118,7 +118,7 @@ public class KryonetServerListener extends Listener {
 				handler.sendLoginFailureResponse(e.getMessage());
 			}
 		} else if (object instanceof LogoutRequest) {
-			LoginOrLogoutEventHandler handler = ConstructorAccess.get(loginOrLogoutEventHandler).newInstance();
+			UserEventHandler handler = ConstructorAccess.get(userEventHandler).newInstance();
 			handler.sender = sender;
 			handler.onLogout();
 			handler.sendLeaveRoomResponse();
