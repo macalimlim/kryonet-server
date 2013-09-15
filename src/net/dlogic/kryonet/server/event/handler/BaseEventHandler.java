@@ -6,6 +6,7 @@ import java.util.List;
 import net.dlogic.kryonet.common.entity.Room;
 import net.dlogic.kryonet.common.entity.User;
 import net.dlogic.kryonet.common.manager.RoomManagerInstance;
+import net.dlogic.kryonet.common.response.ErrorResponse;
 import net.dlogic.kryonet.common.response.GetRoomsResponse;
 import net.dlogic.kryonet.common.response.JoinRoomFailureResponse;
 import net.dlogic.kryonet.common.response.JoinRoomSuccessResponse;
@@ -30,6 +31,11 @@ public abstract class BaseEventHandler {
 		} catch (KryonetServerException e) {
 			e.printStackTrace();
 		}
+	}
+	public void sendErrorResponse(String errorMessage) {
+		ErrorResponse response = new ErrorResponse();
+		response.errorMessage = errorMessage;
+		endpoint.sendToTCP(sender.id, response);
 	}
 	public void sendGetRoomsResponse(List<Room> roomList) {
 		GetRoomsResponse response = new GetRoomsResponse();
