@@ -101,11 +101,15 @@ public class KryonetServerListener extends Listener {
 		} else if (object instanceof LeaveRoomRequest) {
 			LeaveRoomRequest request = (LeaveRoomRequest)object;
 			RoomEventHandler handler = ConstructorAccess.get(roomEventHandler).newInstance();
-			handler.sender = sender;
-			Room targetRoom = roomManager.map.get(request.targetRoomId); 
-			handler.onLeaveRoom(targetRoom);
-			handler.sendLeaveRoomResponse(targetRoom);
-			roomManager.removeUserToRoom(sender, targetRoom.id);
+			try {
+				handler.sender = sender;
+				Room targetRoom = roomManager.map.get(request.targetRoomId); 
+				handler.onLeaveRoom(targetRoom);
+				handler.sendLeaveRoomResponse(targetRoom);
+				roomManager.removeUserToRoom(sender, targetRoom.id);
+			} catch (RoomManagerException e) {
+				//
+			}
 		} else if (object instanceof LoginRequest) {
 			LoginRequest request = (LoginRequest)object;
 			UserEventHandler handler = ConstructorAccess.get(userEventHandler).newInstance();
