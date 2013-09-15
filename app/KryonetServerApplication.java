@@ -1,5 +1,6 @@
 import java.io.IOException;
 
+import net.dlogic.kryonet.common.manager.RoomManagerInstance;
 import net.dlogic.kryonet.server.KryonetServer;
 import net.dlogic.kryonet.server.KryonetServerException;
 import net.dlogic.kryonet.server.KryonetServerInstance;
@@ -15,8 +16,9 @@ public class KryonetServerApplication {
 			KryonetServerInstance.initialize(writeBufferSize, objectBufferSize);
 			KryonetServer server = KryonetServerInstance.getInstance();
 			server.listener.setConnectionEventHandler(MyConnectionEventHandler.class);
-			server.listener.setLoginOrLogoutEventHandler(MyLoginOrLogoutEventHandler.class);
+			server.listener.setLoginOrLogoutEventHandler(MyUserEventHandler.class);
 			server.start(tcpPort, udpPort);
+			//RoomManagerInstance.roomManager.put(1, value);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
