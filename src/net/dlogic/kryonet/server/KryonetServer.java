@@ -9,12 +9,12 @@ import com.esotericsoftware.minlog.Log;
 
 public class KryonetServer {
 	public Server endpoint;
-	public KryonetServerListener listener;
+	public final KryonetServerListener listener = new KryonetServerListener();
 	public KryonetServer(int writeBufferSize, int objectBufferSize) {
 		Log.info("KryonetServer(" + writeBufferSize +  ", " + objectBufferSize + ")");
 		endpoint = new Server(writeBufferSize, objectBufferSize);
 		KryonetUtility.registerClasses(endpoint);
-		endpoint.addListener(listener = new KryonetServerListener());
+		endpoint.addListener(listener);
 	}
 	public void start(int tcpPort, int udpPort) throws IOException {
 		Log.info("KryonetServer.start(" + tcpPort +  ", " + udpPort + ")");
