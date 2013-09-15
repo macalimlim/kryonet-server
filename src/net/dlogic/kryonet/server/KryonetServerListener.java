@@ -62,8 +62,7 @@ public class KryonetServerListener extends Listener {
 		userManager.put(user.id, user);
 	}
 	public void disconnected(Connection connection) {
-		ConstructorAccess<? extends ConnectionEventHandler> access = ConstructorAccess.get(connectionEventHandler);
-		ConnectionEventHandler handler = access.newInstance();
+		ConnectionEventHandler handler = ConstructorAccess.get(connectionEventHandler).newInstance();
 		User sender = userManager.get(connection.getID());
 		handler.sender = sender;
 		handler.onDisconnected();
@@ -74,8 +73,8 @@ public class KryonetServerListener extends Listener {
 		User sender = userManager.get(connection.getID());
 		if (object instanceof GetRoomsRequest) {
 			GetRoomsRequest request = (GetRoomsRequest)object;
-			ConstructorAccess<GenericEventHandler> access = ConstructorAccess.get(genereicEventHandler);
-			GenericEventHandler handler = access.newInstance();
+			GenericEventHandler handler = ConstructorAccess.get(genereicEventHandler).newInstance();
+			handler.sender = sender;
 			Iterator<Room> it = RoomManagerInstance.roomManager.iterator();
 			List<Room> roomList = new ArrayList<Room>();
 			while (it.hasNext()) {
@@ -87,8 +86,7 @@ public class KryonetServerListener extends Listener {
 			handler.sendGetRoomsResponse(roomList);
 		} else if (object instanceof JoinRoomRequest) {
 			JoinRoomRequest request = (JoinRoomRequest)object;
-			ConstructorAccess<? extends RoomEventHandler> access = ConstructorAccess.get(roomEventHandler);
-			RoomEventHandler handler = access.newInstance();
+			RoomEventHandler handler = ConstructorAccess.get(roomEventHandler).newInstance();
 			try {
 				handler.sender = sender;
 				Room targetRoom = roomManager.get(request.targetRoomId);
@@ -102,8 +100,7 @@ public class KryonetServerListener extends Listener {
 			}
 		} else if (object instanceof LeaveRoomRequest) {
 			LeaveRoomRequest request = (LeaveRoomRequest)object;
-			ConstructorAccess<? extends RoomEventHandler> access = ConstructorAccess.get(roomEventHandler);
-			RoomEventHandler handler = access.newInstance();
+			RoomEventHandler handler = ConstructorAccess.get(roomEventHandler).newInstance();
 			handler.sender = sender;
 			Room targetRoom = roomManager.get(request.targetRoomId); 
 			handler.onLeaveRoom(targetRoom);
@@ -111,8 +108,7 @@ public class KryonetServerListener extends Listener {
 			roomManager.removeUserToRoom(sender, targetRoom.id);
 		} else if (object instanceof LoginRequest) {
 			LoginRequest request = (LoginRequest)object;
-			ConstructorAccess<? extends LoginOrLogoutEventHandler> access = ConstructorAccess.get(loginOrLogoutEventHandler);
-			LoginOrLogoutEventHandler handler = access.newInstance();
+			LoginOrLogoutEventHandler handler = ConstructorAccess.get(loginOrLogoutEventHandler).newInstance();
 			try {
 				handler.sender = sender;
 				handler.onLogin(request.username, request.password);
@@ -122,8 +118,7 @@ public class KryonetServerListener extends Listener {
 				handler.sendLoginFailureResponse(e.getMessage());
 			}
 		} else if (object instanceof LogoutRequest) {
-			ConstructorAccess<? extends LoginOrLogoutEventHandler> access = ConstructorAccess.get(loginOrLogoutEventHandler);
-			LoginOrLogoutEventHandler handler = access.newInstance();
+			LoginOrLogoutEventHandler handler = ConstructorAccess.get(loginOrLogoutEventHandler).newInstance();
 			handler.sender = sender;
 			handler.onLogout();
 			handler.sendLeaveRoomResponse();
@@ -131,16 +126,14 @@ public class KryonetServerListener extends Listener {
 			userManager.remove(sender.id);
 		} else if (object instanceof PrivateMessageRequest) {
 			PrivateMessageRequest request = (PrivateMessageRequest)object;
-			ConstructorAccess<? extends PersonMessageEventHandler> access = ConstructorAccess.get(personMessageEventHandler);
-			PersonMessageEventHandler handler = access.newInstance();
+			PersonMessageEventHandler handler = ConstructorAccess.get(personMessageEventHandler).newInstance();
 			handler.sender = sender;
 			User targetUser = userManager.get(request.targetUserId);
 			handler.onPrivateMessage(targetUser, request.message);
 			handler.sendPrivateMessageResponse(targetUser, request.message);
 		} else if (object instanceof PublicMessageRequest) {
 			PublicMessageRequest request = (PublicMessageRequest)object;
-			ConstructorAccess<? extends PersonMessageEventHandler> access = ConstructorAccess.get(personMessageEventHandler);
-			PersonMessageEventHandler handler = access.newInstance();
+			PersonMessageEventHandler handler = ConstructorAccess.get(personMessageEventHandler).newInstance();
 			handler.sender = sender;
 			Room targetRoom = roomManager.get(request.targetRoomId);
 			handler.onPublicMessage(targetRoom, request.message);
