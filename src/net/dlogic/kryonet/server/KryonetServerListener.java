@@ -1,9 +1,5 @@
 package net.dlogic.kryonet.server;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import net.dlogic.kryonet.common.entity.Room;
 import net.dlogic.kryonet.common.entity.User;
 import net.dlogic.kryonet.common.exception.JoinRoomException;
@@ -22,9 +18,9 @@ import net.dlogic.kryonet.common.request.PrivateMessageRequest;
 import net.dlogic.kryonet.common.request.PublicMessageRequest;
 import net.dlogic.kryonet.server.event.handler.ConnectionEventHandler;
 import net.dlogic.kryonet.server.event.handler.GenericEventHandler;
-import net.dlogic.kryonet.server.event.handler.UserEventHandler;
 import net.dlogic.kryonet.server.event.handler.PersonMessageEventHandler;
 import net.dlogic.kryonet.server.event.handler.RoomEventHandler;
+import net.dlogic.kryonet.server.event.handler.UserEventHandler;
 
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
@@ -78,19 +74,7 @@ public class KryonetServerListener extends Listener {
 			GetRoomsRequest request = (GetRoomsRequest)object;
 			GenericEventHandler handler = ConstructorAccess.get(genereicEventHandler).newInstance();
 			handler.sender = sender;			
-			Iterator<Room> it = RoomManagerInstance.manager.map.values().iterator();
-			List<Room> roomList = new ArrayList<Room>();
-			while (it.hasNext()) {
-				Room room = it.next();
-				if (request.search == null) {
-					roomList.add(room);
-				} else {
-					if (room.name.equalsIgnoreCase(request.search) || room.name.toLowerCase().indexOf(request.search.toLowerCase()) != -1) {
-						roomList.add(room);
-					}
-				}
-			}
-			handler.sendGetRoomsResponse(roomList);
+			handler.sendGetRoomsResponse(RoomManagerInstance.manager.getRooms(request.search));
 		} else if (object instanceof JoinRoomRequest) {
 			JoinRoomRequest request = (JoinRoomRequest)object;
 			RoomEventHandler handler = ConstructorAccess.get(roomEventHandler).newInstance();
