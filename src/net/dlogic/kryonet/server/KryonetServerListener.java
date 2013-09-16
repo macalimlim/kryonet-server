@@ -85,7 +85,7 @@ public class KryonetServerListener extends Listener {
 				if (request.search == null) {
 					roomList.add(room);
 				} else {
-					if (room.name.equalsIgnoreCase(request.search)) {
+					if (room.name.equalsIgnoreCase(request.search) || room.name.toLowerCase().indexOf(request.search.toLowerCase()) != -1) {
 						roomList.add(room);
 					}
 				}
