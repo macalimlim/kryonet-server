@@ -14,5 +14,11 @@ public class MyConnectionEventHandler extends ConnectionEventHandler {
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public void onIdle() {
+		// TODO Auto-generated method stub
+		
+	}
 	
 }
