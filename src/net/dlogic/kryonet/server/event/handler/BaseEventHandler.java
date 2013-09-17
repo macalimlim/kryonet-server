@@ -45,8 +45,8 @@ public abstract class BaseEventHandler {
 		Iterator<User> it = joinedRoom.users.values().iterator();
 		while (it.hasNext()) {
 			JoinRoomSuccessResponse response = new JoinRoomSuccessResponse();
-			response.joinedUser = joinedUser;
-			response.joinedRoom = joinedRoom;
+			response.userJoined = joinedUser;
+			response.roomJoined = joinedRoom;
 			endpoint.sendToTCP(it.next().id, response);
 		}
 	}
@@ -68,8 +68,8 @@ public abstract class BaseEventHandler {
 		Iterator<User> it = roomToLeave.users.values().iterator();
 		while (it.hasNext()) {
 			LeaveRoomResponse response = new LeaveRoomResponse();
-			response.userToLeave = sender;
-			response.roomToLeave = roomToLeave;
+			response.userLeft = sender;
+			response.roomLeft = roomToLeave;
 			endpoint.sendToTCP(it.next().id, response);
 		}
 	}
