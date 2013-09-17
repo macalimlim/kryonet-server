@@ -56,6 +56,9 @@ public class KryonetServerListener extends Listener {
 		ConnectionEventHandler handler = ConstructorAccess.get(connectionEventHandler).newInstance();
 		User sender = new User();
 		sender.id = connection.getID();
+		sender.isAdmin = false;
+		sender.isItMe = true;
+		sender.isPlayer = false;
 		handler.sender = sender;
 		handler.onConnected();
 		userManager.map.put(sender.id, sender);
@@ -73,8 +76,9 @@ public class KryonetServerListener extends Listener {
 		if (object instanceof GetRoomsRequest) {
 			GetRoomsRequest request = (GetRoomsRequest)object;
 			GenericEventHandler handler = ConstructorAccess.get(genereicEventHandler).newInstance();
-			handler.sender = sender;			
-			handler.sendGetRoomsResponse(RoomManagerInstance.manager.getRooms(request.search));
+			handler.sender = sender;
+			Room[] rooms = RoomManagerInstance.manager.getRooms(request.search);
+			handler.sendGetRoomsResponse(rooms);
 		} else if (object instanceof JoinRoomRequest) {
 			JoinRoomRequest request = (JoinRoomRequest)object;
 			RoomEventHandler handler = ConstructorAccess.get(roomEventHandler).newInstance();
