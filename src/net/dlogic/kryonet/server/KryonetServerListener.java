@@ -80,9 +80,9 @@ public class KryonetServerListener extends Listener {
 			RoomEventHandler handler = ConstructorAccess.get(roomEventHandler).newInstance();
 			try {
 				handler.sender = sender;
-				Room targetRoom = roomManager.map.get(request.targetRoomId);
+				Room targetRoom = roomManager.map.get(request.targetRoomName);
 				handler.onJoinRoom(targetRoom, request.password);
-				roomManager.addUserToRoom(sender, targetRoom.id);
+				roomManager.addUserToRoom(sender, targetRoom.name);
 				handler.sendJoinRoomSuccessResponse(sender, targetRoom);
 			} catch (JoinRoomException e) {
 				handler.sendJoinRoomFailureResponse(e.getMessage());
@@ -94,10 +94,10 @@ public class KryonetServerListener extends Listener {
 			RoomEventHandler handler = ConstructorAccess.get(roomEventHandler).newInstance();
 			try {
 				handler.sender = sender;
-				Room targetRoom = roomManager.map.get(request.targetRoomId); 
+				Room targetRoom = roomManager.map.get(request.targetRoomName); 
 				handler.onLeaveRoom(targetRoom);
 				handler.sendLeaveRoomResponse(targetRoom);
-				roomManager.removeUserToRoom(sender, targetRoom.id);
+				roomManager.removeUserToRoom(sender, targetRoom.name);
 			} catch (RoomManagerException e) {
 				handler.sendErrorResponse(e.getMessage());
 			}
@@ -130,12 +130,15 @@ public class KryonetServerListener extends Listener {
 			PublicMessageRequest request = (PublicMessageRequest)object;
 			PersonMessageEventHandler handler = ConstructorAccess.get(personMessageEventHandler).newInstance();
 			handler.sender = sender;
-			Room targetRoom = roomManager.map.get(request.targetRoomId);
+			Room targetRoom = roomManager.map.get(request.targetRoomName);
 			handler.onPublicMessage(targetRoom, request.message);
 			handler.sendPublicMessageResponse(targetRoom, request.message);
 		}
 	}
 	public void idle(Connection connection) {
-		super.idle(connection);
+		ConnectionEventHandler handler = ConstructorAccess.get(connectionEventHandler).newInstance();
+		User sender = userManager.map.get(connection.getID());
+		handler.sender = sender;
+		handler.onIdle();
 	}
 }
