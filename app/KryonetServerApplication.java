@@ -26,20 +26,17 @@ public class KryonetServerApplication {
 			server.endpoint.addListener(new CustomServerListener());
 			server.start(tcpPort, udpPort);
 			Room room1 = new Room();
-			room1.id = 1;
 			room1.name = "Lobby";
 			room1.maxUsers = 16;
-			RoomManagerInstance.manager.map.put(room1.id, room1);
+			RoomManagerInstance.manager.map.put(room1.name, room1);
 			Room room2 = new Room();
-			room2.id = 2;
 			room2.name = "Chat";
 			room2.maxUsers = 16;
-			RoomManagerInstance.manager.map.put(room2.id, room2);
+			RoomManagerInstance.manager.map.put(room2.name, room2);
 			Room room3 = new Room();
-			room3.id = 3;
 			room3.name = "Game";
 			room3.maxUsers = 16;
-			RoomManagerInstance.manager.map.put(room3.id, room3);
+			RoomManagerInstance.manager.map.put(room3.name, room3);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
