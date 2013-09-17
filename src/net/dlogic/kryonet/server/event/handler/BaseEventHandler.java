@@ -42,7 +42,7 @@ public abstract class BaseEventHandler {
 		endpoint.sendToTCP(sender.id, response);
 	}
 	public void sendJoinRoomSuccessResponse(User joinedUser, Room joinedRoom) {
-		Iterator<User> it = joinedRoom.userList.iterator();
+		Iterator<User> it = joinedRoom.users.values().iterator();
 		while (it.hasNext()) {
 			JoinRoomSuccessResponse response = new JoinRoomSuccessResponse();
 			response.joinedUser = joinedUser;
@@ -59,13 +59,13 @@ public abstract class BaseEventHandler {
 		Iterator<Room> it = RoomManagerInstance.manager.map.values().iterator();
 		while (it.hasNext()) {
 			Room room = it.next();
-			if (room.userList.contains(sender)) {
+			if (room.users.containsKey(sender.id)) {
 				sendLeaveRoomResponse(room);
 			}
 		}
 	}
 	public void sendLeaveRoomResponse(Room roomToLeave) {
-		Iterator<User> it = roomToLeave.userList.iterator();
+		Iterator<User> it = roomToLeave.users.values().iterator();
 		while (it.hasNext()) {
 			LeaveRoomResponse response = new LeaveRoomResponse();
 			response.userToLeave = sender;
@@ -95,7 +95,7 @@ public abstract class BaseEventHandler {
 		endpoint.sendToTCP(targetUser.id, response);
 	}
 	public void sendPublicMessageResponse(Room targetRoom, String message) {
-		Iterator<User> it = targetRoom.userList.iterator();
+		Iterator<User> it = targetRoom.users.values().iterator();
 		while (it.hasNext()) {
 			PublicMessageResponse response = new PublicMessageResponse();
 			response.sender = sender;
