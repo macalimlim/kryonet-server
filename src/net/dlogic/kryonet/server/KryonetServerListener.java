@@ -100,8 +100,8 @@ public class KryonetServerListener extends Listener {
 				handler.sender = sender;
 				Room targetRoom = roomManager.map.get(request.targetRoomName); 
 				handler.onLeaveRoom(targetRoom);
-				handler.sendLeaveRoomResponse(targetRoom);
 				roomManager.removeUserToRoom(sender, targetRoom.name);
+				handler.sendLeaveRoomResponse(targetRoom);
 			} catch (RoomManagerException e) {
 				handler.sendErrorResponse(e.getMessage());
 			}
