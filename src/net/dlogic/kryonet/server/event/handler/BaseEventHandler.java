@@ -72,6 +72,10 @@ public abstract class BaseEventHandler {
 			response.roomLeft = roomToLeave;
 			endpoint.sendToTCP(it.next().id, response);
 		}
+		LeaveRoomResponse response = new LeaveRoomResponse();
+		response.userLeft = sender;
+		response.roomLeft = roomToLeave;
+		endpoint.sendToTCP(sender.id, response);
 	}
 	public final void sendLoginSuccessResponse() {
 		Log.info("BaseEventHandler.sendLoginSuccessResponse()");
