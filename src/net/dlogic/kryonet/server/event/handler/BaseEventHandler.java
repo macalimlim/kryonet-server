@@ -42,6 +42,7 @@ public abstract class BaseEventHandler {
 		endpoint.sendToTCP(sender.id, response);
 	}
 	public void sendJoinRoomSuccessResponse(User joinedUser, Room joinedRoom) {
+		Log.debug("BaseEventHandler.sendJoinRoomSuccessResponse()");
 		Iterator<User> it = joinedRoom.users.values().iterator();
 		while (it.hasNext()) {
 			JoinRoomSuccessResponse response = new JoinRoomSuccessResponse();
@@ -74,7 +75,7 @@ public abstract class BaseEventHandler {
 		}
 	}
 	public final void sendLoginSuccessResponse() {
-		Log.info("BaseEventHandler.sendLoginSuccessResponse()");
+		Log.debug("BaseEventHandler.sendLoginSuccessResponse()");
 		LoginSuccessResponse response = new LoginSuccessResponse();
 		response.myself = sender;
 		endpoint.sendToTCP(sender.id, response);
