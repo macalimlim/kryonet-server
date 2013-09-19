@@ -100,8 +100,8 @@ public class KryonetServerListener extends Listener {
 				handler.sender = sender;
 				Room targetRoom = roomManager.map.get(request.targetRoomName); 
 				handler.onLeaveRoom(targetRoom);
-				roomManager.removeUserToRoom(sender, targetRoom.name);
 				handler.sendLeaveRoomResponse(targetRoom);
+				roomManager.removeUserFromRoom(sender, targetRoom.name);
 			} catch (RoomManagerException e) {
 				handler.sendErrorResponse(e.getMessage());
 			}
@@ -118,11 +118,16 @@ public class KryonetServerListener extends Listener {
 			}
 		} else if (object instanceof LogoutRequest) {
 			UserEventHandler handler = ConstructorAccess.get(userEventHandler).newInstance();
-			handler.sender = sender;
-			handler.onLogout();
-			handler.sendLeaveRoomResponse();
-			handler.sendLogoutResponse();
-			userManager.map.remove(sender.id);
+			try {
+				handler.sender = sender;
+				handler.onLogout();
+				handler.sendLeaveRoomResponse();
+				handler.sendLogoutResponse();
+				userManager.map.remove(sender.id);
+				roomManager.removeUserFromAllRooms(sender);
+			} catch (RoomManagerException e) {
+				handler.sendErrorResponse(e.getMessage());
+			}
 		} else if (object instanceof PrivateMessageRequest) {
 			PrivateMessageRequest request = (PrivateMessageRequest)object;
 			PersonMessageEventHandler handler = ConstructorAccess.get(personMessageEventHandler).newInstance();
