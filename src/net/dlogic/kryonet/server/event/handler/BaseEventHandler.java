@@ -72,10 +72,6 @@ public abstract class BaseEventHandler {
 			response.roomLeft = roomToLeave;
 			endpoint.sendToTCP(it.next().id, response);
 		}
-		LeaveRoomResponse response = new LeaveRoomResponse();
-		response.userLeft = sender;
-		response.roomLeft = roomToLeave;
-		endpoint.sendToTCP(sender.id, response);
 	}
 	public final void sendLoginSuccessResponse() {
 		Log.info("BaseEventHandler.sendLoginSuccessResponse()");
@@ -101,11 +97,11 @@ public abstract class BaseEventHandler {
 	public void sendPublicMessageResponse(Room targetRoom, String message) {
 		Iterator<User> it = targetRoom.users.values().iterator();
 		while (it.hasNext()) {
-			PublicMessageResponse response = new PublicMessageResponse();
-			response.sender = sender;
-			response.message = message;
 			User user = it.next();
 			if (sender.id != user.id) {
+				PublicMessageResponse response = new PublicMessageResponse();
+				response.sender = sender;
+				response.message = message;
 				endpoint.sendToTCP(user.id, response);
 			}
 		}
