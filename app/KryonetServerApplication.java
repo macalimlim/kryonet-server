@@ -1,5 +1,7 @@
 import java.io.IOException;
 
+import com.esotericsoftware.minlog.Log;
+
 import net.dlogic.kryonet.common.entity.Room;
 import net.dlogic.kryonet.common.manager.RoomManagerInstance;
 import net.dlogic.kryonet.common.utility.KryonetUtility;
@@ -11,6 +13,7 @@ import net.dlogic.kryonet.server.KryonetServerInstance;
 public class KryonetServerApplication {
 	public static void main(String[] args) {
 		try {
+			Log.DEBUG();
 			int writeBufferSize = Integer.parseInt(args[0]);
 			int objectBufferSize = Integer.parseInt(args[1]);
 			int tcpPort = Integer.parseInt(args[2]);
