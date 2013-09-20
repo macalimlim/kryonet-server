@@ -11,13 +11,13 @@ public class KryonetServer {
 	public Server endpoint;
 	public final KryonetServerListener listener = new KryonetServerListener();
 	public KryonetServer(int writeBufferSize, int objectBufferSize) {
-		Log.info("KryonetServer(" + writeBufferSize +  ", " + objectBufferSize + ")");
+		Log.debug("KryonetServer(" + writeBufferSize +  ", " + objectBufferSize + ")");
 		endpoint = new Server(writeBufferSize, objectBufferSize);
 		KryonetUtility.registerClasses(endpoint);
 		endpoint.addListener(listener);
 	}
 	public void start(int tcpPort, int udpPort) throws IOException {
-		Log.info("KryonetServer.start(" + tcpPort +  ", " + udpPort + ")");
+		Log.debug("KryonetServer.start(" + tcpPort +  ", " + udpPort + ")");
 		endpoint.start();
 		endpoint.bind(tcpPort, udpPort);
 	}

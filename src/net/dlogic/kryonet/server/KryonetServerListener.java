@@ -36,7 +36,7 @@ public class KryonetServerListener extends Listener {
 	private Class<? extends UserEventHandler> userEventHandler;
 	private Class<? extends PersonMessageEventHandler> personMessageEventHandler;
 	public KryonetServerListener() {
-		Log.info("KryonetServerListener()");
+		Log.debug("KryonetServerListener()");
 		userManager = UserManagerInstance.manager;
 		roomManager = RoomManagerInstance.manager;
 	}
