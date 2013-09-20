@@ -1,7 +1,5 @@
 package net.dlogic.kryonet.server.event.handler;
 
-import java.util.Iterator;
-
 import net.dlogic.kryonet.common.entity.Room;
 import net.dlogic.kryonet.common.entity.User;
 import net.dlogic.kryonet.common.manager.RoomManagerInstance;
@@ -15,6 +13,7 @@ import net.dlogic.kryonet.common.response.LoginSuccessResponse;
 import net.dlogic.kryonet.common.response.LogoutResponse;
 import net.dlogic.kryonet.common.response.PrivateMessageResponse;
 import net.dlogic.kryonet.common.response.PublicMessageResponse;
+import net.dlogic.kryonet.common.utility.IForEach;
 import net.dlogic.kryonet.server.KryonetServerException;
 import net.dlogic.kryonet.server.KryonetServerInstance;
 
@@ -41,15 +40,16 @@ public abstract class BaseEventHandler {
 		response.rooms = rooms;
 		endpoint.sendToTCP(sender.id, response);
 	}
-	public void sendJoinRoomSuccessResponse(User joinedUser, Room joinedRoom) {
+	public void sendJoinRoomSuccessResponse(final User joinedUser, final Room joinedRoom) {
 		Log.debug("BaseEventHandler.sendJoinRoomSuccessResponse()");
-		Iterator<User> it = joinedRoom.users.values().iterator();
-		while (it.hasNext()) {
-			JoinRoomSuccessResponse response = new JoinRoomSuccessResponse();
-			response.userJoined = joinedUser;
-			response.roomJoined = joinedRoom;
-			endpoint.sendToTCP(it.next().id, response);
-		}
+		joinedRoom.forEachUser(new IForEach<User>() {
+			public void exec(User entity) {
+				JoinRoomSuccessResponse response = new JoinRoomSuccessResponse();
+				response.userJoined = joinedUser;
+				response.roomJoined = joinedRoom;
+				endpoint.sendToTCP(entity.id, response);
+			}
+		});
 	}
 	public void sendJoinRoomFailureResponse(String errorMessage) {
 		JoinRoomFailureResponse response = new JoinRoomFailureResponse();
@@ -57,22 +57,23 @@ public abstract class BaseEventHandler {
 		endpoint.sendToTCP(sender.id, response);
 	}
 	public void sendLeaveRoomResponse() {
-		Iterator<Room> it = RoomManagerInstance.manager.map.values().iterator();
-		while (it.hasNext()) {
-			Room room = it.next();
-			if (room.users.containsKey(sender.id)) {
-				sendLeaveRoomResponse(room);
+		RoomManagerInstance.manager.forEachRoom(new IForEach<Room>() {
+			public void exec(Room entity) {
+				if (entity.users.containsKey(sender.id)) {
+					sendLeaveRoomResponse(entity);
+				}
 			}
-		}
+		});
 	}
-	public void sendLeaveRoomResponse(Room roomToLeave) {
-		Iterator<User> it = roomToLeave.users.values().iterator();
-		while (it.hasNext()) {
-			LeaveRoomResponse response = new LeaveRoomResponse();
-			response.userLeft = sender;
-			response.roomLeft = roomToLeave;
-			endpoint.sendToTCP(it.next().id, response);
-		}
+	public void sendLeaveRoomResponse(final Room roomToLeave) {
+		roomToLeave.forEachUser(new IForEach<User>() {
+			public void exec(User entity) {
+				LeaveRoomResponse response = new LeaveRoomResponse();
+				response.userLeft = sender;
+				response.roomLeft = roomToLeave;
+				endpoint.sendToTCP(entity.id, response);
+			}
+		});
 	}
 	public final void sendLoginSuccessResponse() {
 		Log.debug("BaseEventHandler.sendLoginSuccessResponse()");
@@ -95,16 +96,16 @@ public abstract class BaseEventHandler {
 		response.message = message;
 		endpoint.sendToTCP(targetUser.id, response);
 	}
-	public void sendPublicMessageResponse(Room targetRoom, String message) {
-		Iterator<User> it = targetRoom.users.values().iterator();
-		while (it.hasNext()) {
-			User user = it.next();
-			if (sender.id != user.id) {
-				PublicMessageResponse response = new PublicMessageResponse();
-				response.sender = sender;
-				response.message = message;
-				endpoint.sendToTCP(user.id, response);
+	public void sendPublicMessageResponse(Room targetRoom, final String message) {
+		targetRoom.forEachUser(new IForEach<User>() {
+			public void exec(User entity) {
+				if (sender.id != entity.id) {
+					PublicMessageResponse response = new PublicMessageResponse();
+					response.sender = sender;
+					response.message = message;
+					endpoint.sendToTCP(entity.id, response);
+				}
 			}
-		}
+		});
 	}
 }
