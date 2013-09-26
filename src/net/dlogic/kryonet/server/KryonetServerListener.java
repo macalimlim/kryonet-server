@@ -87,7 +87,7 @@ public class KryonetServerListener extends Listener {
 				Room targetRoom = roomManager.map.get(request.targetRoomName);
 				handler.onJoinRoom(targetRoom, request.password);
 				roomManager.addUserToRoom(sender, targetRoom.name);
-				handler.sendJoinRoomSuccessResponse(sender, targetRoom);
+				handler.sendJoinRoomSuccessResponse(targetRoom);
 			} catch (JoinRoomException e) {
 				handler.sendJoinRoomFailureResponse(e.getMessage());
 			} catch (RoomManagerException e) {

@@ -40,12 +40,12 @@ public abstract class BaseEventHandler {
 		response.rooms = rooms;
 		endpoint.sendToTCP(sender.id, response);
 	}
-	public void sendJoinRoomSuccessResponse(final User joinedUser, final Room joinedRoom) {
+	public void sendJoinRoomSuccessResponse(final Room joinedRoom) {
 		Log.debug("BaseEventHandler.sendJoinRoomSuccessResponse()");
 		joinedRoom.forEachUser(new IForEach<User>() {
 			public void exec(User entity) {
 				JoinRoomSuccessResponse response = new JoinRoomSuccessResponse();
-				response.userJoined = joinedUser;
+				response.userJoined = sender;
 				response.roomJoined = joinedRoom;
 				endpoint.sendToTCP(entity.id, response);
 			}
